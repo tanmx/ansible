@@ -8,4 +8,4 @@
     shell: "{{ bin_dir }}/kubectl apply -f /tmp/nvidia-plugin.yml"
   when:
     - has_gpu is defined
-    - has_gpu
+    - has_gpu | bool

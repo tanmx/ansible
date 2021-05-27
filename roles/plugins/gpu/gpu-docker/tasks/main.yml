@@ -36,4 +36,4 @@
       group: root
   when:
     - has_gpu is defined
-    - has_gpu
+    - has_gpu | bool
