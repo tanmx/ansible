@@ -1,9 +1,19 @@
 - name: NFS | Install nfs-utils
-  yum:
+  package:
     name:
       - nfs-utils
     state: present
-    update_cache: yes
+  when:
+    - ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+
+- name: NFS | Install nfs-utils
+  package:
+    name:
+      - nfs-common
+    state: present
+  when:
+    - ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
     - name: NFS| Set defaultvers

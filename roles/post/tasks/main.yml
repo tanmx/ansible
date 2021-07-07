@@ -4,7 +4,7 @@
   until: '"kube-system" in etcd_status.stdout'
   run_once: true
   retries: 10
-  delay: 2
+  delay: 6
 
 - name: Get cluster node info
   shell: "{{ bin_dir }}/kubectl get node -o name"
@@ -19,6 +19,7 @@
       {{ bin_dir }}/kubectl label node {{ inventory_hostname }} node-role.kubernetes.io/worker- &&
       {{ bin_dir }}/kubectl label node {{ inventory_hostname }} node-role.kubernetes.io/lb- &&
       {{ bin_dir }}/kubectl label node {{ inventory_hostname }} node-role.kubernetes.io/etcd-
+    ignore_errors: true
 
   - name: Setup master node role
     shell: >
@@ -52,21 +53,7 @@
   delegate_to: "{{ groups['kube-master'][0] }}"
 
 - block:
-  - name: Get cluster namespace info
-    shell: "{{ bin_dir }}/kubectl get namespace"
-    register: namespace_output
-
-  - name: Create kube-operator namespace
-    shell: "{{ bin_dir }}/kubectl create namespace kube-operator"
-    when: '"kube-operator" not in namespace_output.stdout'
+  - name: Ensure kube-operator namespace
+    shell: " {{ bin_dir }}/kubectl get namespaces | grep kube-operator || {{ bin_dir }}/kubectl create namespace kube-operator"
   run_once: true
   delegate_to: "{{ groups['kube-master'][0] }}"
-
-- name: Create node Gpu label
-  shell: "{{ bin_dir }}/kubectl label node {{ inventory_hostname }} hasGpu=yes --overwrite"
-  delegate_to: "{{ groups['kube-master'][0] }}"
-  when:
-    - container_runtime == 'docker'
-    - has_gpu is defined
-    - has_gpu | bool
-    - support_gpu == 'enable'

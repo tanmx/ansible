@@ -1,15 +1,40 @@
 - name: Remove ntp
-  shell: 'yum remove -y ntp'
-  args:
-    warn: false
+  package:
+    name:
+      - ntp
+    state: absent
   ignore_errors: true
 
 - name: Install chrony
-  yum:
+  package:
     name:
       - chrony
     state: present
-    update_cache: yes
+  when: ansible_distribution != "Ubuntu" or ansible_distribution_major_version|int > 16
+
+
+- block:
+  - name: Create chrony download directory ('Ubuntu major version' < 18)
+    file:
+      name: "{{ base_dir }}/chrony"
+      state: directory
+
+  - name: Download chrony package ('Ubuntu major version' < 18)
+    get_url:
+      validate_certs: no
+      url: "{{ chrony_download_url }}"
+      dest: "{{ base_dir }}/chrony"
+      timeout: "{{ download_timeout_online }}"
+
+  - name: Unarchive chrony package ('Ubuntu major version' < 18)
+    unarchive:
+      src: "{{ base_dir }}/chrony/chrony_xenial.tar.gz"
+      dest: "{{ base_dir }}/chrony"
+      remote_src: yes
+
+  - name: Install chrony ('Ubuntu major version' < 18)
+    shell: "dpkg -i {{ base_dir }}/chrony/*.deb"
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int < 18
 
 - block:
   - name: Setup chrony server
@@ -17,12 +42,20 @@
       src: server-centos.conf.j2
       dest: /etc/chrony.conf
 
-  - name:  chrony server
+  - name:  CentOS | chrony server
     service:
       name: chronyd
       state: restarted
       enabled: yes
-  when: 'inventory_hostname == groups.chrony[0]'
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+  - name:  Debian | start chrony server
+    service:
+      name: chrony
+      state: restarted
+      enabled: yes
+    when: ansible_distribution in [ 'Ubuntu','Debian' ]
+  when: inventory_hostname == groups['chrony'][0]
 
 - block:
   - name: Config chrony client
@@ -35,7 +68,20 @@
       name: chronyd
       state: restarted
       enabled: yes
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+  - name: Start chrony client
+    service:
+      name: chrony
+      state: restarted
+      enabled: yes
+    when: ansible_distribution in [ 'Ubuntu','Debian' ]
+
+  - name: Calibration time server
+    shell: "chronyc tracking"
 
   - name: Active sync time
     shell: "chronyc -a makestep"
+    when: ansible_user == "root"
   when: 'inventory_hostname != groups.chrony[0]'
+

@@ -1,10 +1,19 @@
 - block:
   - name: OceanStor | Install iscsi-initiator-utils
-    yum:
+    package:
       name:
       - iscsi-initiator-utils
       state: present
-      update_cache: yes
+    when:
+      - ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+  - name: OceanStor | Install iscsi-initiator-utils
+    package:
+      name:
+        - open-iscsi
+      state: present
+    when:
+      - ansible_distribution in [ 'Ubuntu','Debian' ]
 
   - name: OceanStor | Enable iscsi service
     service:
@@ -12,21 +21,42 @@
       enabled: yes
   when: oceanstor_type == "iscsi"
 
-- name: OceanStor | Install nfs-utils
-  yum:
-    name:
-    - nfs-utils
-    state: present
-    update_cache: yes
+- block:
+  - name: OceanStor | Install nfs-utils
+    package:
+      name:
+        - nfs-utils
+      state: present
+    when:
+      - ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+  - name: OceanStor | Install nfs-utils
+    package:
+      name:
+        - nfs-common
+      state: present
+    when:
+      - ansible_distribution in [ 'Ubuntu','Debian' ]
   when: oceanstor_type == "nfs"
 
-- name: OceanStor | Install multipath
-  yum:
-    name:
-    - device-mapper
-    - device-mapper-multipath
-    state: present
-    update_cache: yes
+- block:
+  - name: OceanStor | CentOS | Install multipath
+    package:
+      name:
+      - device-mapper
+      - device-mapper-multipath
+      state: present
+    when:
+      - ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+  - name: OceanStor | Debian | Install multipath
+    package:
+      name:
+        - multipath-tools
+        - multipath-tools-boot
+      state: present
+    when:
+      - ansible_distribution in [ 'Ubuntu','Debian' ]
   when:
   - oceanstor_is_multipath == "yes"
   - oceanstor_type != "nfs"

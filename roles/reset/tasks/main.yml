@@ -108,6 +108,15 @@
     state: stopped
     enabled: no
   ignore_errors: true
+  when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+- name: Stop and disable chronyd
+  service:
+    name: chrony
+    state: stopped
+    enabled: no
+  ignore_errors: true
+  when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - name: Remove kubelet directory
   mount: 
@@ -124,6 +133,7 @@
     state: absent
   with_items:
   - "{{ kubelet_root_dir }}"
+  - "{{ ansible_env.PWD }}/.kube"
   - "{{ ansible_env.HOME }}/.kube"
   - "/etc/kubernetes"
   - "/var/lib/kubelet"

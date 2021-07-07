@@ -10,6 +10,8 @@ npd_versioon: "v0.8.1"
 # ----------------------- 容器镜像地址 ---------------------
 # coredns
 coredns_image_name: "{{ dns_repository_hostname }}:{{ registry_port }}/coredns"
+# dns-cache
+dns_cache_image: "{{ dns_repository_hostname }}:{{ registry_port }}/kubeoperator/k8s-dns-node-cache:{{ dns_cache_version }}"
 # Pod image 地址
 pod_infra_container_image: "k8s.gcr.io/pause:{{ pause_version }}"
 # 基础容器 image 地址
@@ -26,6 +28,9 @@ calico_pod2daemon_flexvol_image: "{{ dns_repository_hostname }}:{{ registry_port
 calicoctl_image: "{{ dns_repository_hostname }}:{{ registry_port }}/calico/ctl:{{ calico_version }}"
 # flannel image 地址
 flannel_image: "{{ dns_repository_hostname }}:{{ registry_port }}/coreos/flannel:{{ flannel_version }}"
+# cilium image 地址
+cilium_image: "{{ dns_repository_hostname }}:{{ registry_port }}/cilium/cilium:{{ cilium_version }}"
+cilium_operator_image: "{{ dns_repository_hostname }}:{{ registry_port }}/cilium/operator-generic:{{ cilium_version }}"
 # ingress-controller 镜像地址
 nginx_ingress_image: "{{ dns_repository_hostname }}:{{ registry_port }}/kubernetes-ingress-controller/nginx-ingress-controller:{{ nginx_ingress_version }}"
 traefik_ingress_image: "{{ dns_repository_hostname }}:{{ registry_port }}/traefik:{{ traefik_ingress_version }}"
@@ -60,6 +65,15 @@ vsphere_csi_livenessprobe_image: "{{ dns_repository_hostname }}:{{ registry_port
 vsphere_csi_provisioner_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-provisioner:{{ vsphere_csi_provisioner_version }}"
 vsphere_csi_attacher_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-attacher:{{ vsphere_csi_attacher_version }}"
 vsphere_csi_node_driver_registrar_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-node-driver-registrar:{{ vsphere_csi_node_driver_registrar_version }}"
+# cinder
+cinder_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scloudprovider/cinder-csi-plugin:{{ cinder_csi_version }}"
+cinder_csi_attacher_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-attacher:{{ cinder_csi_attacher_version }}"
+cinder_csi_provisioner_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-provisioner:{{ cinder_csi_provisioner_version }}"
+cinder_csi_snapshotter_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-snapshotter:{{ cinder_csi_snapshotter_version }}"
+cinder_csi_resizer_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-resizer:{{ cinder_csi_resizer_version }}"
+cinder_csi_livenessprobe_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/livenessprobe:{{ cinder_csi_livenessprobe_version }}"
+cinder_csi_registrar_image: "{{ dns_repository_hostname }}:{{ registry_port }}/k8scsi/csi-node-driver-registrar:{{ cinder_csi_node_driver_registrar_version }}"
+
 # nvidia gpu
 nvidia_k8s_device_plugin: "{{ dns_repository_hostname }}:{{ registry_port }}/nvidia/k8s-device-plugin:1.0.0-beta"
 # ----------------------- 集群参数设置 ---------------------------
@@ -77,11 +91,6 @@ kube_config_dir: "/etc/kubernetes"
 download_timeout_online: "900"
 # 仓库地址
 dns_repository_hostname: "registry.kubeoperator.io"
-# Yum、Raw 访问端口
-repo_port: "8081"
-# Docker Registry 访问端口
-registry_port: "8082"
-registry_hosted_port: "8083"
 # 加入集群token
 kubeadm_token: "abcdef.0123456789abcdef"
 # Kubelet 根目录
@@ -133,3 +142,6 @@ huawei_csi_passwdencrypt_download_url: "{{ registry_protocol }}://{{ dns_reposit
 # ----------------------- helm 仓库地址 --------------------
 helm2_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/helm/{{ helm_v2_version }}/helm-{{ helm_v2_version }}-linux-{{ architectures }}.tar.gz"
 helm3_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/helm/{{ helm_v3_version }}/helm-{{ helm_v3_version }}-linux-{{ architectures }}.tar.gz"
+
+# ----------------------- chrony 下载地址 --------------------
+chrony_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/chrony/{{ architectures }}/chrony_xenial.tar.gz"
