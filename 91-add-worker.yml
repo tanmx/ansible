@@ -2,8 +2,14 @@
   roles:
   - prepare/repository
   - prepare/base
-  - prepare/nameserver
   - chrony
+
+- hosts:
+  - kube-master
+  - kube-worker
+  - new-worker
+  roles:
+  - prepare/nameserver
 
 - hosts: new-worker
   roles:
@@ -36,7 +42,10 @@
   roles:
   - post
 
-- hosts: all
+- hosts:
+  - kube-master
+  - kube-worker
+  - new-worker
   gather_facts: false
   roles:
   - plugins/network-plugins/network-prepare
@@ -46,7 +55,30 @@
   roles:
   - plugins/network-plugins/network-deploy
 
+- hosts: new-worker
+  gather_facts: false
+  tasks:
+  - block:
+    - name: Get ClusterIP of kube-dns
+      shell: "{{ bin_dir }}/kubectl get svc -n kube-system | grep kube-dns | grep -v upstream | awk '{ print $3 }'"
+      register: kube_dns_clusterip
+      run_once: true
+
+    - name: Modify the kubelet config file
+      lineinfile:
+        path: "/var/lib/kubelet/config.yaml"
+        regexp: '- {{ kube_dns_clusterip.stdout }}'
+        line: "- {{ pillar_local_dns }}"
+
+    - name: Restart kubelet
+      service:
+        name: kubelet
+        state: restarted
+    when:
+    - kube_proxy_mode == "ipvs"
+    - enable_dns_cache == "enable"
+
 - hosts: kube-master[0]
   gather_facts: false
   roles:
-    - { role: plugins/gpu/gpu-operator, when: "container_runtime == 'docker' and support_gpu == 'enable'" }
+  - { role: plugins/gpu/gpu-operator, when: "container_runtime == 'docker' and support_gpu == 'enable'" }
