@@ -1,59 +1,76 @@
 - block:
-  - name: OceanStor | Install iscsi-initiator-utils
-    package:
-      name:
-      - iscsi-initiator-utils
-      state: present
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+    - name: Download oceanStor-utils package | CentOS
+      get_url:
+        validate_certs: no
+        url: "{{ oceanStor_rpm_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
 
-  - name: OceanStor | Install iscsi-initiator-utils
-    package:
-      name:
-        - open-iscsi
-      state: present
-    when: ansible_distribution in [ 'Ubuntu','Debian' ]
+    - name: Unarchive oceanStor-utils package | CentOS
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_oceanStor_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
 
-  - name: OceanStor | Enable iscsi service
-    service:
-      name: iscsi
-      enabled: yes
-  when: oceanstor_type == "iscsi"
+    - name: Install base package | CentOS
+      shell: "rpm -Uvh {{ base_dir }}/packages/{{ ansible_distribution }}_oceanStor/*.rpm"
+  when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
-  - name: OceanStor | Install nfs-utils
-    package:
-      name:
-        - nfs-utils
-      state: present
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+    - name: Download oceanStor-utils package | Debian
+      get_url:
+        validate_certs: no
+        url: "{{ oceanStor_deb_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
 
-  - name: OceanStor | Install nfs-utils
-    package:
-      name:
-        - nfs-common
-      state: present
+    - name: Unarchive oceanStor-utils package | Debian
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
+
+    - name: Install oceanStor-utils package | Debian
+      shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor/*.deb"
+  when: ansible_distribution in [ 'Ubuntu','Debian' ]
+
+- block:
+  - block:
+      - name: Download nfs-utils package | CentOS
+        get_url:
+          validate_certs: no
+          url: "{{ nfs_rpm_download_url }}"
+          dest: "{{ base_dir }}/packages"
+          timeout: "{{ download_timeout_online }}"
+  
+      - name: Unarchive nfs-utils package | CentOS
+        unarchive:
+          src: "{{ base_dir }}/packages/{{ ansible_distribution }}_nfs_{{ ansible_architecture }}.tar.gz"
+          dest: "{{ base_dir }}/packages"
+          remote_src: yes
+  
+      - name: Install base package | CentOS
+        shell: "rpm -Uvh {{ base_dir }}/packages/{{ ansible_distribution }}_nfs/*.rpm"
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+  
+  - block:
+      - name: Download nfs-utils package | Debian
+        get_url:
+          validate_certs: no
+          url: "{{ nfs_deb_download_url }}"
+          dest: "{{ base_dir }}/packages"
+          timeout: "{{ download_timeout_online }}"
+  
+      - name: Unarchive nfs-utils package | Debian
+        unarchive:
+          src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs_{{ ansible_architecture }}.tar.gz"
+          dest: "{{ base_dir }}/packages"
+          remote_src: yes
+  
+      - name: Install nfs-utils package | Debian
+        shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
     when: ansible_distribution in [ 'Ubuntu','Debian' ]
   when: oceanstor_type == "nfs"
-
-- block:
-  - name: OceanStor | CentOS | Install multipath
-    package:
-      name:
-      - device-mapper
-      - device-mapper-multipath
-      state: present
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
-
-  - name: OceanStor | Debian | Install multipath
-    package:
-      name:
-        - multipath-tools
-        - multipath-tools-boot
-      state: present
-    when: ansible_distribution in [ 'Ubuntu','Debian' ]
-  when:
-  - oceanstor_is_multipath == "yes"
-  - oceanstor_type != "nfs"
 
 - block:
   - name: OceanStor | Create passwdEncrypt directory

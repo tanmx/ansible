@@ -1,3 +1,9 @@
+# 创建安装包存放目录
+- name: Create download directory
+  file:
+    name: "{{ base_dir }}/packages"
+    state: directory
+
 # 公共系统参数设置
 - include_tasks: common.yml
 

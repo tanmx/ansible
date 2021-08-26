@@ -1,9 +1,3 @@
-- name: Install haproxy
-  package:
-    name:
-      - haproxy
-    state: present
-
 - name: Create haproxy directory
   file: name=/etc/haproxy state=directory
 

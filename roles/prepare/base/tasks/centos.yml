@@ -10,18 +10,24 @@
     enabled: no
   when: '"active" in firewalld_already_installed.stdout'
 
-- name: Install base rpm package
-  package:
-    name:
-    - conntrack-tools
-    - bash-completion
-    - libseccomp
-    - psmisc
-    - rsync
-    - socat
-    - sshpass
-    state: latest
+# 安装基础组件
+- name: Download base package | CentOS
+  get_url:
+    validate_certs: no
+    url: "{{ base_rpm_download_url }}"
+    dest: "{{ base_dir }}/packages"
+    timeout: "{{ download_timeout_online }}"
 
+- name: Unarchive base package | CentOS
+  unarchive:
+    src: "{{ base_dir }}/packages/{{ ansible_distribution }}_base_{{ ansible_architecture }}.tar.gz"
+    dest: "{{ base_dir }}/chrony"
+    remote_src: yes
+
+- name: Install base package | CentOS
+  shell: "rpm -Uvh {{ base_dir }}/packages/{{ ansible_distribution }}_base/*.rpm"
+
+# 安装 ipvs
 - name: Install ipvs rpm package
   package:
     name:

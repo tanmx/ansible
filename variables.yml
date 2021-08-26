@@ -145,4 +145,19 @@ helm2_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ 
 helm3_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/helm/{{ helm_v3_version }}/helm-{{ helm_v3_version }}-linux-{{ architectures }}.tar.gz"
 
 # ----------------------- chrony 下载地址 --------------------
-chrony_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/chrony/{{ architectures }}/chrony_xenial.tar.gz"
+#chrony_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/chrony/{{ architectures }}/chrony_xenial.tar.gz"
+
+# ----------------------- centos rpm下载地址 --------------------
+base_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_base_{{ ansible_architecture }}.tar.gz"
+ipvs_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_ipvs_{{ ansible_architecture }}.tar.gz"
+ceph_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_ceph_{{ ansible_architecture }}.tar.gz"
+gfs_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_gfs_{{ ansible_architecture }}.tar.gz"
+oceanstor_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_architecture }}.tar.gz"
+
+# ----------------------- ubuntu deb下载地址 --------------------
+base_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base_{{ ansible_architecture }}.tar.gz"
+ipvs_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs_{{ ansible_architecture }}.tar.gz"
+ceph_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph_{{ ansible_architecture }}.tar.gz"
+gfs_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs_{{ ansible_architecture }}.tar.gz"
+oceanstor_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/package/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor_{{ ansible_architecture }}.tar.gz"
+

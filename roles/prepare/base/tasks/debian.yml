@@ -19,18 +19,24 @@
     enabled: no
   when: '"active" in ufw_already_installed.stdout'
 
-- name: Debian | Install base package
-  package:
-    name:
-    - conntrack
-    - bash-completion
-    - libseccomp2
-    - psmisc
-    - rsync
-    - socat
-    - sshpass
-    state: latest
+# 安装基础组件
+- name: Download base package | Debian
+  get_url:
+    validate_certs: no
+    url: "{{ base_deb_download_url }}"
+    dest: "{{ base_dir }}/packages"
+    timeout: "{{ download_timeout_online }}"
 
+- name: Unarchive base package | Debian
+  unarchive:
+    src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base_{{ ansible_architecture }}.tar.gz"
+    dest: "{{ base_dir }}/packages"
+    remote_src: yes
+
+- name: Install base package | Debian
+  shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base/*.deb"
+
+# 安装 ipvs
 - name: Debian | Install ipvs  package
   package:
     name:

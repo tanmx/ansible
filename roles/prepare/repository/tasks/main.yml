@@ -33,14 +33,6 @@
     - yum_operate == 'replace'
     - ansible_distribution in [ 'Ubuntu','Debian' ]
 
-  - name: Install yum-plugin-protectbase rpm package
-    package:
-      name: yum-plugin-protectbase
-      state: latest
-    when:
-    - yum_operate == 'coexist'
-    - ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
-
   - name: Insert yum record
     blockinfile:
       path: "/etc/yum.conf"

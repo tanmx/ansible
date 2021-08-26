@@ -69,14 +69,6 @@
       dest: /etc/keepalived/keepalived.conf
     when: lb_role == "backup"
 
-  - name: Install haproxy + keepalived
-    package:
-      name: "{{ item }}"
-      state: present
-    with_items:
-    - haproxy
-    - keepalived
-
   - block:
     - name: Arm64 | Modify EulerOS haproxy.service
       template:
