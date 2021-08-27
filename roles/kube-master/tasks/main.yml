@@ -1,18 +1,18 @@
 - name: Create kubernetes directory
-  file: 
+  file:
     name: "{{ item }}"
     state: directory
   with_items:
-  - "{{ kubelet_root_dir }}"
-  - "{{ audit_policy_file | dirname }}"
-  - /etc/kubernetes/pki
-  - /etc/kubernetes/config
-  - /etc/kubernetes/manifests
-  - /var/log/kubernetes/audit
-  - /usr/share/bash-completion/completions
+    - "{{ kubelet_root_dir }}"
+    - "{{ audit_policy_file | dirname }}"
+    - /etc/kubernetes/pki
+    - /etc/kubernetes/config
+    - /etc/kubernetes/manifests
+    - /var/log/kubernetes/audit
+    - /usr/share/bash-completion/completions
 
 - name: Read kubelet.conf file stat info
-  stat: 
+  stat:
     path: /etc/kubernetes/kubelet.conf
   register: kubelet_conf_stat
 
@@ -38,16 +38,16 @@
 
 # 初始化第一个 master 节点
 - include_tasks: master-init.yml
-  when: 
-  - not kubelet_conf_stat.stat.exists
-  - inventory_hostname == groups['kube-master'][0]
+  when:
+    - not kubelet_conf_stat.stat.exists
+    - inventory_hostname == groups['kube-master'][0]
 
 # 初始化其他 master 节点
 - include_tasks: master-join.yml
-  when: 
-  - not kubelet_conf_stat.stat.exists
-  - inventory_hostname != groups['kube-master'][0]
-  - inventory_hostname in groups['kube-master']
+  when:
+    - not kubelet_conf_stat.stat.exists
+    - inventory_hostname != groups['kube-master'][0]
+    - inventory_hostname in groups['kube-master']
 
 - name: Confirm kubelet configuration modify
   template:

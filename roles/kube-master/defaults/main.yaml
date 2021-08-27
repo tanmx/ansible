@@ -40,13 +40,13 @@ audit_policy_file: /etc/kubernetes/config/apiserver-audit-policy.yaml
 #     resources: []
 
 # 1.10+ admission plugins
-kube_apiserver_enable_admission_plugins: 
-- NodeRestriction
+kube_apiserver_enable_admission_plugins:
+  - NodeRestriction
 # - AlwaysPullImages
 # - PodSecurityPolicy
 
 # 1.10+ list of disabled admission plugins
-kube_apiserver_disable_admission_plugins: []
+kube_apiserver_disable_admission_plugins: [ ]
 
 # kube-controller-manager 标记 kubelet(node) 为不健康的周期
 kube_controller_node_monitor_grace_period: 40s
@@ -58,9 +58,9 @@ kube_controller_pod_eviction_timeout: 2m0s
 kube_controller_terminated_pod_gc_threshold: 10
 
 ## Extra args for k8s components passing by kubeadm
-kube_kubeadm_apiserver_extra_args: {}
-kube_kubeadm_controller_extra_args: {}
-kube_kubeadm_scheduler_extra_args: {}
+kube_kubeadm_apiserver_extra_args: { }
+kube_kubeadm_controller_extra_args: { }
+kube_kubeadm_scheduler_extra_args: { }
 
 ## Extra control plane host volume mounts
 ## Example:
@@ -69,6 +69,6 @@ kube_kubeadm_scheduler_extra_args: {}
 #    hostPath: /host/path
 #    mountPath: /mount/path
 #    readOnly: true
-apiserver_extra_volumes: {}
-controller_manager_extra_volumes: {}
-scheduler_extra_volumes: {}
+apiserver_extra_volumes: { }
+controller_manager_extra_volumes: { }
+scheduler_extra_volumes: { }

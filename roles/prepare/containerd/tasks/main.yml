@@ -9,8 +9,8 @@
 - name: Prepare containerd directory
   file: name={{ item }} state=directory
   with_items:
-  - "{{ bin_dir }}"
-  - "/etc/containerd"
+    - "{{ bin_dir }}"
+    - "/etc/containerd"
 
 - name: Load kernel module overlay
   modprobe: name=overlay state=present
@@ -18,9 +18,9 @@
 - name: Create containerd directory
   file: name={{ item }} state=directory
   with_items:
-  - "{{ base_dir }}/containerd"
-  - "{{ base_dir }}/crictl"
-  - "{{ base_dir }}/runc"
+    - "{{ base_dir }}/containerd"
+    - "{{ base_dir }}/crictl"
+    - "{{ base_dir }}/runc"
 
 - name: Download containerd file
   get_url:
@@ -36,7 +36,7 @@
     dest: "{{ base_dir}}/containerd"
     remote_src: yes
   tags: upgrade
-  
+
 - name: Copy the containerd file to env
   copy:
     src: "{{ base_dir}}/containerd/bin/{{ item }}"
@@ -44,21 +44,21 @@
     remote_src: yes
     mode: "0755"
   with_items:
-  - containerd
-  - containerd-shim
-  - containerd-shim-runc-v1
-  - containerd-shim-runc-v2
-  - ctr
+    - containerd
+    - containerd-shim
+    - containerd-shim-runc-v1
+    - containerd-shim-runc-v2
+    - ctr
   tags: upgrade
 
 - block:
-  - name: Copy the containerd-stress file to env
-    copy:
-      src: "{{ base_dir}}/containerd/bin/containerd-stress"
-      dest: "{{ bin_dir }}/"
-      remote_src: yes
-      mode: "0755"
-    tags: upgrade
+    - name: Copy the containerd-stress file to env
+      copy:
+        src: "{{ base_dir}}/containerd/bin/containerd-stress"
+        dest: "{{ bin_dir }}/"
+        remote_src: yes
+        mode: "0755"
+      tags: upgrade
   when: containerd_version == "1.3.6"
 
 - name: Download crictl file

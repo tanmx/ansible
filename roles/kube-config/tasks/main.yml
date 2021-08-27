@@ -1,5 +1,5 @@
 - name: Read kubelet.conf file stat info
-  stat: 
+  stat:
     path: /etc/kubernetes/kubelet.conf
   register: kubelet_conf_stat
 

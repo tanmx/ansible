@@ -1,23 +1,23 @@
 - name: Create kubernetes certificate directory
-  file: 
+  file:
     name: "{{ item }}"
     state: directory
   with_items:
-  - /etc/kubernetes/pki
-  - /var/lib/kubelet/pki
+    - /etc/kubernetes/pki
+    - /var/lib/kubelet/pki
 
 - block:
-  # 获取密钥状态
-  - include_tasks: certs_stat.yml
-  # 生成公共证书
-  - include_tasks: common.yml
+    # 获取密钥状态
+    - include_tasks: certs_stat.yml
+    # 生成公共证书
+    - include_tasks: common.yml
   when: inventory_hostname == groups['kube-master'][0]
 
 # 分发证书
 - include_tasks: distribute.yml
 
 - name: Read kubelet.conf file stat info
-  stat: 
+  stat:
     path: /etc/kubernetes/kubelet.conf
   register: kubelet_conf_stat
 

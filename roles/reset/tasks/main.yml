@@ -10,105 +10,105 @@
   ignore_errors: true
 
 - block:
-  - name: Stop and disable docker service
-    service:
-      name: docker
-      state: stopped
-      enabled: no
-    ignore_errors: true
+    - name: Stop and disable docker service
+      service:
+        name: docker
+        state: stopped
+        enabled: no
+      ignore_errors: true
 
-  - name: Unmount docker filesystem-1
-    mount:
-      path: /var/run/docker/netns/default
-      state: unmounted
-    ignore_errors: true
+    - name: Unmount docker filesystem-1
+      mount:
+        path: /var/run/docker/netns/default
+        state: unmounted
+      ignore_errors: true
 
-  - name: Unmount docker filesystem-2
-    mount:
-      path: "{{ docker_storage_dir }}/overlay"
-      state: unmounted
-    ignore_errors: true
+    - name: Unmount docker filesystem-2
+      mount:
+        path: "{{ docker_storage_dir }}/overlay"
+        state: unmounted
+      ignore_errors: true
 
-  - name: Remove files and dirs
-    file: name={{ item }} state=absent
-    with_items:
-    - "{{ docker_storage_dir }}"
-    - "/var/run/docker/"
-    - "/etc/docker/"
-    - "/etc/systemd/system/docker.service"
-    - "/etc/systemd/system/docker.service.requires/"
-    - "/etc/systemd/system/docker.service.d/"
-    - "/etc/bash_completion.d/docker"
-    - "{{ bin_dir }}/docker"
-    ignore_errors: true
+    - name: Remove files and dirs
+      file: name={{ item }} state=absent
+      with_items:
+        - "{{ docker_storage_dir }}"
+        - "/var/run/docker/"
+        - "/etc/docker/"
+        - "/etc/systemd/system/docker.service"
+        - "/etc/systemd/system/docker.service.requires/"
+        - "/etc/systemd/system/docker.service.d/"
+        - "/etc/bash_completion.d/docker"
+        - "{{ bin_dir }}/docker"
+      ignore_errors: true
   when: container_runtime == 'docker'
 
 - block:
-  - name: Stop and disable containerd service
-    service:
-      name: containerd
-      state: stopped
-      enabled: no
-    ignore_errors: true
+    - name: Stop and disable containerd service
+      service:
+        name: containerd
+        state: stopped
+        enabled: no
+      ignore_errors: true
 
-  - name: Umount containerd filesystems
-    shell: "mount | grep 'containerd/io.containerd'| awk '{print $3}'|xargs umount || exit 0"
-    args:
-      warn: false
-    ignore_errors: true
+    - name: Umount containerd filesystems
+      shell: "mount | grep 'containerd/io.containerd'| awk '{print $3}'|xargs umount || exit 0"
+      args:
+        warn: false
+      ignore_errors: true
 
-  - name: Remove files and dirs
-    file: name={{ item }} state=absent
-    with_items:
-    - "/etc/containerd/"
-    - "/etc/crictl.yaml"
-    - "/etc/systemd/system/containerd.service"
-    - "/opt/containerd/"
-    - "{{ containerd_storage_dir }}"
-    - "/var/run/containerd/"
-    ignore_errors: true
+    - name: Remove files and dirs
+      file: name={{ item }} state=absent
+      with_items:
+        - "/etc/containerd/"
+        - "/etc/crictl.yaml"
+        - "/etc/systemd/system/containerd.service"
+        - "/opt/containerd/"
+        - "{{ containerd_storage_dir }}"
+        - "/var/run/containerd/"
+      ignore_errors: true
   when: container_runtime == 'containerd'
 
 - block:
-  - name: Stop and disable etcd service
-    service:
-      name: etcd
-      state: stopped
-      enabled: no
-    ignore_errors: true
+    - name: Stop and disable etcd service
+      service:
+        name: etcd
+        state: stopped
+        enabled: no
+      ignore_errors: true
 
-  - name: Remove files and dirs
-    file: name={{ item }} state=absent
-    with_items:
-    - "{{ etcd_data_dir }}"
-    - "/etc/etcd/"
-    - "/backup/k8s"
-    - "/etc/systemd/system/etcd.service"
-    ignore_errors: true
+    - name: Remove files and dirs
+      file: name={{ item }} state=absent
+      with_items:
+        - "{{ etcd_data_dir }}"
+        - "/etc/etcd/"
+        - "/backup/k8s"
+        - "/etc/systemd/system/etcd.service"
+      ignore_errors: true
   when: "inventory_hostname in groups['etcd']"
 
 - block:
-  - name: Remove service haproxy
-    service:
-      name: haproxy
-      state: stopped
-      enabled: no
-    ignore_errors: true
+    - name: Remove service haproxy
+      service:
+        name: haproxy
+        state: stopped
+        enabled: no
+      ignore_errors: true
 
-  - name: Remove service keepalived
-    service:
-      name: keepalived
-      state: stopped
-      enabled: no
-    ignore_errors: true
+    - name: Remove service keepalived
+      service:
+        name: keepalived
+        state: stopped
+        enabled: no
+      ignore_errors: true
 
-  - name: Remove files and dirs
-    file: name={{ item }} state=absent
-    with_items:
-    - "/etc/haproxy"
-    - "/etc/keepalived"
-    - "/usr/lib/systemd/system/haproxy.service"
-    ignore_errors: true
+    - name: Remove files and dirs
+      file: name={{ item }} state=absent
+      with_items:
+        - "/etc/haproxy"
+        - "/etc/keepalived"
+        - "/usr/lib/systemd/system/haproxy.service"
+      ignore_errors: true
 
 - name: Stop and disable chronyd
   service:
@@ -127,29 +127,29 @@
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - name: Remove kubelet directory
-  mount: 
+  mount:
     path: "{{ item }}"
     state: unmounted
   with_items:
-  - /var/lib/kubelet 
-  - /var/run/kubelet
+    - /var/lib/kubelet
+    - /var/run/kubelet
   ignore_errors: true
 
 - name: Remove kubelet related file or directory
-  file: 
+  file:
     name: "{{ item }}"
     state: absent
   with_items:
-  - "{{ kubelet_root_dir }}"
-  - "{{ ansible_env.PWD }}/.kube"
-  - "{{ ansible_env.HOME }}/.kube"
-  - "/etc/kubernetes"
-  - "/var/lib/kubelet"
-  - "/var/run/kubelet"
-  - "/usr/lib/systemd/system/kubelet.service"
-  - "/usr/lib/systemd/system/kubelet.service.d/"
-  - "/usr/share/bash-completion/completions/kubectl"
-  - "/etc/systemd/system/kubelet.service.d/20-kubelet-override.conf"
+    - "{{ kubelet_root_dir }}"
+    - "{{ ansible_env.PWD }}/.kube"
+    - "{{ ansible_env.HOME }}/.kube"
+    - "/etc/kubernetes"
+    - "/var/lib/kubelet"
+    - "/var/run/kubelet"
+    - "/usr/lib/systemd/system/kubelet.service"
+    - "/usr/lib/systemd/system/kubelet.service.d/"
+    - "/usr/share/bash-completion/completions/kubectl"
+    - "/etc/systemd/system/kubelet.service.d/20-kubelet-override.conf"
   ignore_errors: true
 
 - name: Remove other related files or directories
@@ -157,40 +157,40 @@
     path: "{{ item }}"
     state: absent
   with_items:
-  - "{{ etcd_data_dir }}"
-  - /etc/cni/net.d
-  - /etc/sysctl.d/95-k8s-sysctl.conf
-  - /etc/modules-load.d/10-k8s-modules.conf
-  - /run/flannel
-  - /etc/calico
-  - /var/run/calico
-  - /var/lib/calico
-  - /var/log/calico
-  - /var/run/openvswitch
-  - /etc/origin/openvswitch
-  - /etc/openvswitch
-  - /var/log/openvswitch
+    - "{{ etcd_data_dir }}"
+    - /etc/cni/net.d
+    - /etc/sysctl.d/95-k8s-sysctl.conf
+    - /etc/modules-load.d/10-k8s-modules.conf
+    - /run/flannel
+    - /etc/calico
+    - /var/run/calico
+    - /var/lib/calico
+    - /var/log/calico
+    - /var/run/openvswitch
+    - /etc/origin/openvswitch
+    - /etc/openvswitch
+    - /var/log/openvswitch
   ignore_errors: true
 
 - name: Remove ulimits related configuration
-  file: 
+  file:
     name: "{{ item }} "
     state: absent
   with_items:
-  - /etc/systemd/system.conf.d/30-k8s-ulimits.conf
+    - /etc/systemd/system.conf.d/30-k8s-ulimits.conf
   ignore_errors: true
 
 - name: Clean up iptables
   shell: "{{ item }} || true"
   with_items:
-  - iptables -F
-  - iptables -X
-  - iptables -F -t nat
-  - iptables -X -t nat
-  - iptables -F -t raw
-  - iptables -X -t raw
-  - iptables -F -t mangle
-  - iptables -X -t mangle
+    - iptables -F
+    - iptables -X
+    - iptables -F -t nat
+    - iptables -X -t nat
+    - iptables -F -t raw
+    - iptables -X -t raw
+    - iptables -F -t mangle
+    - iptables -X -t mangle
   ignore_errors: true
 
 - name: Refresh iptables
@@ -198,31 +198,31 @@
     table: "{{ item }}"
     flush: yes
   with_items:
-  - filter
-  - nat
+    - filter
+    - nat
   ignore_errors: true
 
 - name: Clean up ipvsadm
   shell: "{{ item }} || true"
   with_items:
-  - ipvsadm --clear
+    - ipvsadm --clear
   ignore_errors: true
 
 - name: remove virtual network
   shell: "{{ item }} || true"
   with_items:
-  - ip link del docker0
-  - ip link del tunl0
-  - ip link del flannel.1
-  - ip link del cni0
-  - ip link del mynet0
-  - ip link del kube-bridge
-  - ip link del dummy0
-  - ip link del kube-ipvs0
-  - ip link del cilium_net
-  - ip link del cilium_vxlan
-  - ip link del ovn0
-  - ip link del ovs-system
+    - ip link del docker0
+    - ip link del tunl0
+    - ip link del flannel.1
+    - ip link del cni0
+    - ip link del mynet0
+    - ip link del kube-bridge
+    - ip link del dummy0
+    - ip link del kube-ipvs0
+    - ip link del cilium_net
+    - ip link del cilium_vxlan
+    - ip link del ovn0
+    - ip link del ovs-system
   ignore_errors: true
 
 - name: Systemctl daemon-reload
@@ -243,9 +243,9 @@
     regexp: "^{{ hostvars[item]['ansible_ssh_host'] }} {{ item }}"
     state: absent
   with_items:
-  - "{{ groups['kube-master'] }}"
-  - "{{ groups['kube-worker'] }}"
-  - "{{ groups['new-worker'] }}"
+    - "{{ groups['kube-master'] }}"
+    - "{{ groups['kube-worker'] }}"
+    - "{{ groups['new-worker'] }}"
   ignore_errors: true
 
 - name: Restart network

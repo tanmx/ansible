@@ -2,8 +2,8 @@
 ansible_become: true
 
 # 1.10+ admission plugins
-kube_apiserver_enable_admission_plugins: 
-- NodeRestriction
+kube_apiserver_enable_admission_plugins:
+  - NodeRestriction
 # - AlwaysPullImages
 # - PodSecurityPolicy
 

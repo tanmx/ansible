@@ -8,12 +8,12 @@
 
     - name: Unarchive nfs-utils package | CentOS
       unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_nfs_{{ ansible_architecture }}.tar.gz"
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs_{{ ansible_architecture }}.tar.gz"
         dest: "{{ base_dir }}/packages"
         remote_src: yes
 
     - name: Install base package | CentOS
-      shell: "rpm -Uvh {{ base_dir }}/packages/{{ ansible_distribution }}_nfs/*.rpm"
+      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs/*.rpm --nodeps --force"
   when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
@@ -32,6 +32,7 @@
 
   - name: Install nfs-utils package | Debian
     shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
+    ignore_errors: true
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:

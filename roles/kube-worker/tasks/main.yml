@@ -1,11 +1,11 @@
 - name: Create kubernetes directory
-  file: 
+  file:
     name: "{{ item }}"
     state: directory
   with_items:
-  - "{{ kubelet_root_dir }}"
-  - /etc/kubernetes
-  - /usr/share/bash-completion/completions
+    - "{{ kubelet_root_dir }}"
+    - /etc/kubernetes
+    - /usr/share/bash-completion/completions
 
 - name: Read kubelet.conf file stat info
   stat:
@@ -13,44 +13,44 @@
   register: kubelet_conf_stat
 
 - include_tasks: "{{ (role_path + '/../kube-master/tasks/kubeadm-config.yml') | realpath  }}"
-  when: 
-  - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
-  - inventory_hostname not in groups['kube-master']
+  when:
+    - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
+    - inventory_hostname not in groups['kube-master']
 
 - block:
-  - name: Confirm kubelet has stopped
-    service:
-      name: kubelet
-      state: stopped
-      enabled: yes
+    - name: Confirm kubelet has stopped
+      service:
+        name: kubelet
+        state: stopped
+        enabled: yes
 
-  - name: Worker node join the cluster
-    shell: >
-      {{ bin_dir }}/kubeadm join --config /etc/kubernetes/kubeadm-config.yaml
-      --ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests
-  when: 
-  - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
-  - inventory_hostname not in groups['kube-master']
-  - not kubelet_conf_stat.stat.exists
+    - name: Worker node join the cluster
+      shell: >
+        {{ bin_dir }}/kubeadm join --config /etc/kubernetes/kubeadm-config.yaml
+        --ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests
+  when:
+    - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
+    - inventory_hostname not in groups['kube-master']
+    - not kubelet_conf_stat.stat.exists
 
 - block:
-  - name: Confirm kubelet configuration modify
-    template:
-      src: kubelet-config.v1beta1.yaml.j2
-      dest: /var/lib/kubelet/config.yaml
-      owner: root
-      mode: 0644
-    register: configuration_result
-  
-  - name: Restart kubelet service
-    service:
-      name: kubelet
-      state: restarted
-      enabled: yes
-    when: configuration_result.changed
-  when: 
-  - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
-  - inventory_hostname not in groups['kube-master']
+    - name: Confirm kubelet configuration modify
+      template:
+        src: kubelet-config.v1beta1.yaml.j2
+        dest: /var/lib/kubelet/config.yaml
+        owner: root
+        mode: 0644
+      register: configuration_result
+
+    - name: Restart kubelet service
+      service:
+        name: kubelet
+        state: restarted
+        enabled: yes
+      when: configuration_result.changed
+  when:
+    - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
+    - inventory_hostname not in groups['kube-master']
 
 - name: Cancel the master node taint in the worker group
   shell: >
@@ -58,17 +58,17 @@
     {{ bin_dir }}/kubectl taint nodes {{inventory_hostname}} node-role.kubernetes.io/master-
   delegate_to: "{{ groups['kube-master'][0] }}"
   ignore_errors: true
-  when: 
-  - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
-  - inventory_hostname in groups['kube-master']
+  when:
+    - inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
+    - inventory_hostname in groups['kube-master']
 
 - name: Create kubeconfig directory
   file:
     name: "{{ item }}"
     state: directory
   with_items:
-  - "{{ ansible_env.PWD }}/.kube"
-  - "{{ ansible_env.HOME }}/.kube"
+    - "{{ ansible_env.PWD }}/.kube"
+    - "{{ ansible_env.HOME }}/.kube"
 
 - name: Copy kubeconfig file to .kube directory
   copy:
@@ -76,8 +76,8 @@
     dest: "{{ item }}/config"
     mode: 0600
   with_items:
-  - "{{ ansible_env.PWD | default('/root') }}/.kube"
-  - "{{ ansible_env.HOME | default('/root') }}/.kube"
+    - "{{ ansible_env.PWD | default('/root') }}/.kube"
+    - "{{ ansible_env.HOME | default('/root') }}/.kube"
 
 - name: Set the permissions for the kubeconfig file
   file:

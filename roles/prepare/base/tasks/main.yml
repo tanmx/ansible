@@ -20,6 +20,6 @@
     name: "{{ item }}"
     state: directory
   with_items:
-  - "{{ bin_dir }}"
-  - "{{ ansible_env.PWD }}/.kube"
-  - "{{ ansible_env.HOME }}/.kube"
+    - "{{ bin_dir }}"
+    - "{{ ansible_env.PWD }}/.kube"
+    - "{{ ansible_env.HOME }}/.kube"

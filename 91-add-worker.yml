@@ -1,6 +1,5 @@
 - hosts: new-worker
   roles:
-  - prepare/repository
   - prepare/base
   - chrony
 

@@ -20,12 +20,12 @@
 
 - name: Unarchive base package | CentOS
   unarchive:
-    src: "{{ base_dir }}/packages/{{ ansible_distribution }}_base_{{ ansible_architecture }}.tar.gz"
-    dest: "{{ base_dir }}/chrony"
+    src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_base_{{ ansible_architecture }}.tar.gz"
+    dest: "{{ base_dir }}/packages"
     remote_src: yes
 
 - name: Install base package | CentOS
-  shell: "rpm -Uvh {{ base_dir }}/packages/{{ ansible_distribution }}_base/*.rpm"
+  shell: "rpm -Uh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_base/*.rpm --nodeps --force"
 
 # 安装 ipvs
 - name: Install ipvs rpm package

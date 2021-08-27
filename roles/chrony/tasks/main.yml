@@ -6,51 +6,51 @@
   ignore_errors: true
 
 - block:
-  - name: Setup chrony server
-    template:
-      src: server-centos.conf.j2
-      dest: /etc/chrony.conf
+    - name: Setup chrony server
+      template:
+        src: server-centos.conf.j2
+        dest: /etc/chrony.conf
 
-  - name:  CentOS | chrony server
-    service:
-      name: chronyd
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+    - name: CentOS | chrony server
+      service:
+        name: chronyd
+        state: restarted
+        enabled: yes
+      when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
-  - name:  Debian | start chrony server
-    service:
-      name: chrony
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'Ubuntu','Debian' ]
+    - name: Debian | start chrony server
+      service:
+        name: chrony
+        state: restarted
+        enabled: yes
+      when: ansible_distribution in [ 'Ubuntu','Debian' ]
   when: inventory_hostname == groups['chrony'][0]
 
 - block:
-  - name: Config chrony client
-    template:
-      src: client-centos.conf.j2
-      dest: /etc/chrony.conf
+    - name: Config chrony client
+      template:
+        src: client-centos.conf.j2
+        dest: /etc/chrony.conf
 
-  - name: Start chrony client
-    service:
-      name: chronyd
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+    - name: Start chrony client
+      service:
+        name: chronyd
+        state: restarted
+        enabled: yes
+      when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
-  - name: Start chrony client
-    service:
-      name: chrony
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'Ubuntu','Debian' ]
+    - name: Start chrony client
+      service:
+        name: chrony
+        state: restarted
+        enabled: yes
+      when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
-  - name: Calibration time server
-    shell: "chronyc tracking"
+    - name: Calibration time server
+      shell: "chronyc tracking"
 
-  - name: Active sync time
-    shell: "chronyc -a makestep"
-    when: ansible_user == "root"
+    - name: Active sync time
+      shell: "chronyc -a makestep"
+      when: ansible_user == "root"
   when: 'inventory_hostname != groups.chrony[0]'
 

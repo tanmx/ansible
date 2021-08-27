@@ -10,6 +10,6 @@
     regexp: "{{ item }}"
     line: "{{ hostvars[item]['ansible_ssh_host'] }} {{ item }}"
   with_items:
-  - "{{ groups['kube-master'] }}"
-  - "{{ groups['kube-worker'] }}"
-  - "{{ groups['new-worker'] }}"
+    - "{{ groups['kube-master'] }}"
+    - "{{ groups['kube-worker'] }}"
+    - "{{ groups['new-worker'] }}"

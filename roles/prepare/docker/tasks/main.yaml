@@ -9,12 +9,12 @@
 - name: Prepare docker directory
   file: name={{ item }} state=directory
   with_items:
-  - /etc/docker
+    - /etc/docker
 
 - name: Create base directory
   file: name={{ item }} state=directory
   with_items:
-  - "{{ base_dir }}"
+    - "{{ base_dir }}"
 
 - name: Download the Docker binaries
   get_url:
@@ -45,14 +45,14 @@
     remote_src: yes
     mode: "0755"
   with_items:
-  - containerd
-  - containerd-shim
-  - docker-init
-  - runc
-  - docker
-  - ctr
-  - dockerd
-  - docker-proxy
+    - containerd
+    - containerd-shim
+    - docker-init
+    - runc
+    - docker
+    - ctr
+    - dockerd
+    - docker-proxy
   tags: upgrade
   when: "DOCKER_VER|float >= 18.09"
 
@@ -63,7 +63,7 @@
     remote_src: yes
     mode: "0755"
   with_items:
-  - containerd-shim-runc-v2
+    - containerd-shim-runc-v2
   tags: upgrade
   when: "DOCKER_VER|float >= 20.10"
 

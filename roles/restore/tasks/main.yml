@@ -1,14 +1,14 @@
 - block:
-  - name: Read etcd backup file
-    find:
-      paths: "{{ ('/var/ko/data/backup/' + cluster_name) | realpath  }}"
-      patterns: "{{ etcd_snapshot_name }}"
-    register: etcd_back_paths
+    - name: Read etcd backup file
+      find:
+        paths: "{{ ('/var/ko/data/backup/' + cluster_name) | realpath  }}"
+        patterns: "{{ etcd_snapshot_name }}"
+      register: etcd_back_paths
 
-  - name: Verify the backup file exists
-    assert:
-      that: etcd_back_paths.files|length >= 1
-      msg: "未获取到etcd备份文件。"
+    - name: Verify the backup file exists
+      assert:
+        that: etcd_back_paths.files|length >= 1
+        msg: "未获取到etcd备份文件。"
   delegate_to: localhost
 
 - name: Confirm kubelet has stopped running
@@ -26,7 +26,7 @@
     name: "{{ item }}"
     state: directory
   with_items:
-  - /etc/kubernetes/backup/etcd
+    - /etc/kubernetes/backup/etcd
 
 - name: Copy etcd backup file to all etcd node
   copy:

@@ -18,16 +18,16 @@
     remote_src: yes
     mode: "0755"
   with_items:
-  - kubeadm
-  - kubelet
-  - kubectl
+    - kubeadm
+    - kubelet
+    - kubectl
 
 - name: Prepare some dirs
   file: name={{ item }} state=directory
   with_items:
-  - /etc/kubernetes/images
-  - /etc/kubernetes/manifests
-  - /usr/lib/systemd/system/kubelet.service.d
+    - /etc/kubernetes/images
+    - /etc/kubernetes/manifests
+    - /usr/lib/systemd/system/kubelet.service.d
 
 - name: Create kubelet systemd unit file
   template: src=kubelet.service.j2 dest=/usr/lib/systemd/system/kubelet.service
@@ -55,58 +55,58 @@
     line: 'source <(kubectl completion bash)'
 
 - block:
-  - name: Download kube-master image
-    get_url:
-      validate_certs: no
-      url: "{{ item }}"
-      dest: "{{ base_dir }}/k8s"
-      timeout: "{{ download_timeout_online }}"
-    with_items:
-    - "{{ kube_controller_manager_download_url }}"
-    - "{{ kube_apiserver_download_url }}"
-    - "{{ kube_scheduler_download_url }}"
+    - name: Download kube-master image
+      get_url:
+        validate_certs: no
+        url: "{{ item }}"
+        dest: "{{ base_dir }}/k8s"
+        timeout: "{{ download_timeout_online }}"
+      with_items:
+        - "{{ kube_controller_manager_download_url }}"
+        - "{{ kube_apiserver_download_url }}"
+        - "{{ kube_scheduler_download_url }}"
 
-  - name: Docker | Load kube-master image
-    shell: "{{ bin_dir }}/docker load -i {{ base_dir }}/k8s/{{ item }}"
-    with_items:
-    - kube-controller-manager.tar
-    - kube-apiserver.tar
-    - kube-scheduler.tar
-    when: container_runtime == 'docker'
+    - name: Docker | Load kube-master image
+      shell: "{{ bin_dir }}/docker load -i {{ base_dir }}/k8s/{{ item }}"
+      with_items:
+        - kube-controller-manager.tar
+        - kube-apiserver.tar
+        - kube-scheduler.tar
+      when: container_runtime == 'docker'
 
-  - name: Containerd | Load kube-master image
-    shell: "{{ bin_dir }}/ctr -n=k8s.io images import {{ base_dir }}/k8s/{{ item }}"
-    with_items:
-    - kube-controller-manager.tar
-    - kube-apiserver.tar
-    - kube-scheduler.tar
-    when: container_runtime == 'containerd'
+    - name: Containerd | Load kube-master image
+      shell: "{{ bin_dir }}/ctr -n=k8s.io images import {{ base_dir }}/k8s/{{ item }}"
+      with_items:
+        - kube-controller-manager.tar
+        - kube-apiserver.tar
+        - kube-scheduler.tar
+      when: container_runtime == 'containerd'
   when: inventory_hostname in groups['kube-master']
 
 - block:
-  - name: Download kube-proxy pause image
-    get_url:
-      validate_certs: no
-      url: "{{ item }}"
-      dest: "{{ base_dir }}/k8s"
-      timeout: "{{ download_timeout_online }}"
-    with_items:
-    - "{{ kube_proxy_download_url }}"
-    - "{{ pause_download_url }}"
-
-  - block:
-    - name: Docker | Load kube-worker image
-      shell: "{{ bin_dir }}/docker load -i {{ base_dir }}/k8s/{{ item }}"
+    - name: Download kube-proxy pause image
+      get_url:
+        validate_certs: no
+        url: "{{ item }}"
+        dest: "{{ base_dir }}/k8s"
+        timeout: "{{ download_timeout_online }}"
       with_items:
-      - kube-proxy.tar
-      - pause.tar
-    when: container_runtime == 'docker'
+        - "{{ kube_proxy_download_url }}"
+        - "{{ pause_download_url }}"
 
-  - block:
-    - name: Containerd | Load kube-worker image
-      shell: "{{ bin_dir }}/ctr -n=k8s.io images import {{ base_dir }}/k8s/{{ item }}"
-      with_items:
-      - kube-proxy.tar
-      - pause.tar
-    when: container_runtime == 'containerd'
+    - block:
+        - name: Docker | Load kube-worker image
+          shell: "{{ bin_dir }}/docker load -i {{ base_dir }}/k8s/{{ item }}"
+          with_items:
+            - kube-proxy.tar
+            - pause.tar
+      when: container_runtime == 'docker'
+
+    - block:
+        - name: Containerd | Load kube-worker image
+          shell: "{{ bin_dir }}/ctr -n=k8s.io images import {{ base_dir }}/k8s/{{ item }}"
+          with_items:
+            - kube-proxy.tar
+            - pause.tar
+      when: container_runtime == 'containerd'
   when: inventory_hostname in (groups['kube-worker'] + groups['new-worker'])
