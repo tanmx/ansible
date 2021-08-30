@@ -27,13 +27,23 @@
 - name: Install base package | CentOS
   shell: "rpm -Uh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_base/*.rpm --nodeps --force"
 
-# 安装 ipvs
-- name: Install ipvs rpm package
-  package:
-    name:
-    - ipset
-    - ipvsadm
-    state: latest
+# 安装 ipv
+- block:
+  - name: Download ipvs package | CentOS
+    get_url:
+      validate_certs: no
+      url: "{{ ipvs_rpm_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
+
+  - name: Unarchive ipvs package | CentOS
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_ipvs_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
+
+  - name: Install ipvs package | CentOS
+    shell: "rpm -Uh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_ipvs/*.rpm --nodeps --force"
   when: kube_proxy_mode == "ipvs"
 
 - name: Temp stop selinux

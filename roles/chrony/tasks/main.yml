@@ -1,9 +1,51 @@
 - name: Remove ntp
-  package:
-    name:
-      - ntp
-    state: absent
+  shell: 'apt remove -y ntp'
   ignore_errors: true
+  when: ansible_distribution in ["Ubuntu","Debian"]
+
+- name: Remove ntp
+  shell: 'yum remove -y ntp'
+  args:
+    warn: false
+  ignore_errors: true
+  when: ansible_distribution in ['CentOS','RedHat','EulerOS']
+
+- block:
+    - name: Download chrony package | CentOS
+      get_url:
+        validate_certs: no
+        url: "{{ chrony_rpm_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
+
+    - name: Unarchive chrony package | CentOS
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
+
+    - name: Install chrony package | CentOS
+      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony/*.rpm --nodeps --force"
+  when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+
+- block:
+    - name: Download chrony package | Debian
+      get_url:
+        validate_certs: no
+        url: "{{ chrony_deb_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
+
+    - name: Unarchive chrony package | Debian
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
+
+    - name: Install chrony package | Debian
+      shell: "cd {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony && apt install -y ./*.deb"
+      ignore_errors: true
+  when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
     - name: Setup chrony server

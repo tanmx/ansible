@@ -1,12 +1,3 @@
-- name: Run "apt-get update"
-  shell: "rm -rf /var/lib/apt/lists/* && /usr/bin/apt-get update -y"
-
-- name: Install Python-apt （'Ubuntu Magjor Version' = 18）
-  shell: "/usr/bin/apt-get install python-apt -y"
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version == "18"
-
 - name: Status firewalld
   shell: >
     systemctl status ufw | grep active || echo "not be found"
@@ -36,23 +27,26 @@
 - name: Install base package | Debian
   shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base/*.deb"
   ignore_errors: true
+
+- block:
 # 安装 ipvs
-- name: Download ipvs package | Debian
-  get_url:
-    validate_certs: no
-    url: "{{ ipvs_deb_download_url }}"
-    dest: "{{ base_dir }}/packages"
-    timeout: "{{ download_timeout_online }}"
+  - name: Download ipvs package | Debian
+    get_url:
+      validate_certs: no
+      url: "{{ ipvs_deb_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-- name: Unarchive ipvs package | Debian
-  unarchive:
-    src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs_{{ ansible_architecture }}.tar.gz"
-    dest: "{{ base_dir }}/packages"
-    remote_src: yes
+  - name: Unarchive ipvs package | Debian
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-- name: Install ipvs package | Debian
-  shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs/*.deb"
-  ignore_errors: true
+  - name: Install ipvs package | Debian
+    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs/*.deb"
+    ignore_errors: true
+  when: kube_proxy_mode == "ipvs"
 
 - name: Disable rsyslog Get journald log 2
   lineinfile:
