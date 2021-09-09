@@ -11,88 +11,87 @@
   when: ansible_distribution in ['CentOS','RedHat','EulerOS']
 
 - block:
-    - name: Download chrony package | CentOS
-      get_url:
-        validate_certs: no
-        url: "{{ chrony_rpm_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download chrony package | CentOS
+    get_url:
+      validate_certs: no
+      url: "{{ chrony_rpm_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive chrony package | CentOS
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive chrony package | CentOS
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install chrony package | CentOS
-      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony/*.rpm --nodeps --force"
+  - name: Install chrony package | CentOS
+    shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony/*.rpm --nodeps --force"
   when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
-    - name: Download chrony package | Debian
-      get_url:
-        validate_certs: no
-        url: "{{ chrony_deb_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download chrony package | Debian
+    get_url:
+      validate_certs: no
+      url: "{{ chrony_deb_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive chrony package | Debian
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive chrony package | Debian
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install chrony package | Debian
-      shell: "cd {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony && apt install -y ./*.deb"
-      ignore_errors: true
+  - name: Install chrony package | Debian
+    shell: "cd {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony && dpkg -i ./*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
-    - name: Setup chrony server
-      template:
-        src: server-centos.conf.j2
-        dest: /etc/chrony.conf
+  - name: Setup chrony server
+    template:
+      src: server-centos.conf.j2
+      dest: /etc/chrony.conf
 
-    - name: CentOS | chrony server
-      service:
-        name: chronyd
-        state: restarted
-        enabled: yes
-      when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+  - name: CentOS | chrony server
+    service:
+      name: chronyd
+      state: restarted
+      enabled: yes
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
-    - name: Debian | start chrony server
-      service:
-        name: chrony
-        state: restarted
-        enabled: yes
-      when: ansible_distribution in [ 'Ubuntu','Debian' ]
+  - name: Debian | start chrony server
+    service:
+      name: chrony
+      state: restarted
+      enabled: yes
+    when: ansible_distribution in [ 'Ubuntu','Debian' ]
   when: inventory_hostname == groups['chrony'][0]
 
 - block:
-    - name: Config chrony client
-      template:
-        src: client-centos.conf.j2
-        dest: /etc/chrony.conf
+  - name: Config chrony client
+    template:
+      src: client-centos.conf.j2
+      dest: /etc/chrony.conf
 
-    - name: Start chrony client
-      service:
-        name: chronyd
-        state: restarted
-        enabled: yes
-      when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+  - name: Start chrony client
+    service:
+      name: chronyd
+      state: restarted
+      enabled: yes
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
-    - name: Start chrony client
-      service:
-        name: chrony
-        state: restarted
-        enabled: yes
-      when: ansible_distribution in [ 'Ubuntu','Debian' ]
+  - name: Start chrony client
+    service:
+      name: chrony
+      state: restarted
+      enabled: yes
+    when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
-    - name: Calibration time server
-      shell: "chronyc tracking"
+  - name: Calibration time server
+    shell: "chronyc tracking"
 
-    - name: Active sync time
-      shell: "chronyc -a makestep"
-      when: ansible_user == "root"
+  - name: Active sync time
+    shell: "chronyc -a makestep"
+    when: ansible_user == "root"
   when: 'inventory_hostname != groups.chrony[0]'
 
