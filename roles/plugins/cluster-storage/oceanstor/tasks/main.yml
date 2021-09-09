@@ -1,167 +1,165 @@
 - block:
-    - name: Download oceanStor-utils package | CentOS
-      get_url:
-        validate_certs: no
-        url: "{{ oceanStor_rpm_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download oceanStor-utils package | CentOS
+    get_url:
+      validate_certs: no
+      url: "{{ oceanStor_rpm_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive oceanStor-utils package | CentOS
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_oceanStor_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive oceanStor-utils package | CentOS
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_oceanStor_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install oceanStor-utils package | CentOS
-      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_oceanStor/*.rpm --nodeps --force"
+  - name: Install oceanStor-utils package | CentOS
+    shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_oceanStor/*.rpm --nodeps --force"
   when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
-    - name: Download oceanStor-utils package | Debian
-      get_url:
-        validate_certs: no
-        url: "{{ oceanStor_deb_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download oceanStor-utils package | Debian
+    get_url:
+      validate_certs: no
+      url: "{{ oceanStor_deb_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive oceanStor-utils package | Debian
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive oceanStor-utils package | Debian
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install oceanStor-utils package | Debian
-      shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor/*.deb"
-      ignore_errors: true
+  - name: Install oceanStor-utils package | Debian
+    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor/*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
-    - block:
-        - name: Download nfs-utils package | CentOS
-          get_url:
-            validate_certs: no
-            url: "{{ nfs_rpm_download_url }}"
-            dest: "{{ base_dir }}/packages"
-            timeout: "{{ download_timeout_online }}"
+  - block:
+    - name: Download nfs-utils package | CentOS
+      get_url:
+        validate_certs: no
+        url: "{{ nfs_rpm_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
 
-        - name: Unarchive nfs-utils package | CentOS
-          unarchive:
-            src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs_{{ ansible_architecture }}.tar.gz"
-            dest: "{{ base_dir }}/packages"
-            remote_src: yes
+    - name: Unarchive nfs-utils package | CentOS
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
 
-        - name: Install nfs-utils package | CentOS
-          shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs/*.rpm --nodeps --force"
-      when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+    - name: Install nfs-utils package | CentOS
+      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs/*.rpm --nodeps --force"
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
-    - block:
-        - name: Download nfs-utils package | Debian
-          get_url:
-            validate_certs: no
-            url: "{{ nfs_deb_download_url }}"
-            dest: "{{ base_dir }}/packages"
-            timeout: "{{ download_timeout_online }}"
+  - block:
+    - name: Download nfs-utils package | Debian
+      get_url:
+        validate_certs: no
+        url: "{{ nfs_deb_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
 
-        - name: Unarchive nfs-utils package | Debian
-          unarchive:
-            src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs_{{ ansible_architecture }}.tar.gz"
-            dest: "{{ base_dir }}/packages"
-            remote_src: yes
+    - name: Unarchive nfs-utils package | Debian
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
 
-        - name: Install nfs-utils package | Debian
-          shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
-          ignore_errors: true
-      when: ansible_distribution in [ 'Ubuntu','Debian' ]
+    - name: Install nfs-utils package | Debian
+      shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
+    when: ansible_distribution in [ 'Ubuntu','Debian' ]
   when: oceanstor_type == "nfs"
 
 - block:
-    - name: OceanStor | Create passwdEncrypt directory
-      file:
-        name: "{{ base_dir }}/oceanstor"
-        state: directory
+  - name: OceanStor | Create passwdEncrypt directory
+    file:
+      name: "{{ base_dir }}/oceanstor"
+      state: directory
 
-    - name: OceanStor | Download passwdEncrypt
-      get_url:
-        validate_certs: no
-        url: "{{ huawei_csi_passwdencrypt_download_url }}"
-        dest: "{{ base_dir }}/oceanstor"
-        timeout: "{{ download_timeout_online }}"
+  - name: OceanStor | Download passwdEncrypt
+    get_url:
+      validate_certs: no
+      url: "{{ huawei_csi_passwdencrypt_download_url }}"
+      dest: "{{ base_dir }}/oceanstor"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: OceanStor | Copy passwdEncrypt to the path
-      copy:
-        src: "{{ base_dir }}/oceanstor/passwdEncrypt"
-        dest: "{{ bin_dir }}/passwdEncrypt"
-        remote_src: yes
-        mode: "0755"
+  - name: OceanStor | Copy passwdEncrypt to the path
+    copy:
+      src: "{{ base_dir }}/oceanstor/passwdEncrypt"
+      dest: "{{ bin_dir }}/passwdEncrypt"
+      remote_src: yes
+      mode: "0755"
 
-    - name: OceanStor | Password encryption
-      shell: "{{ bin_dir }}/passwdEncrypt {{ oceanstor_password }}"
-      register: oceanstor_encryption_password
-      run_once: true
+  - name: OceanStor | Password encryption
+    shell: "{{ bin_dir }}/passwdEncrypt {{ oceanstor_password }}"
+    register: oceanstor_encryption_password
+    run_once: true
 
-    - name: OceanStor | Password encryption
-      shell: "{{ bin_dir }}/passwdEncrypt {{ oceanstor_password }}"
-      register: current_ns
+  - name: OceanStor | Password encryption
+    shell: "{{ bin_dir }}/passwdEncrypt {{ oceanstor_password }}"
+    register: current_ns
 
-    - name: OceanStor | Prepare oceanstor directory
-      file:
-        name: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor"
-        state: directory
+  - name: OceanStor | Prepare oceanstor directory
+    file:
+      name: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor"
+      state: directory
 
-    - name: OceanStor | Prepare csi-configmap
+  - name: OceanStor | Prepare csi-configmap
+    template:
+      src: huawei-csi-configmap.yaml.j2
+      dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-configmap.yaml"
+
+  - block:
+    - name: OceanStor | Prepare single csi-rbac
       template:
-        src: huawei-csi-configmap.yaml.j2
-        dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-configmap.yaml"
+        src: huawei-csi-rbac.yaml.j2
+        dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac.yaml"
 
-    - block:
-        - name: OceanStor | Prepare single csi-rbac
-          template:
-            src: huawei-csi-rbac.yaml.j2
-            dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac.yaml"
-
-        - name: OceanStor | Prepare single csi-controller
-          template:
-            src: huawei-csi-controller.yaml.j2
-            dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-controller.yaml"
-      when: oceanstor_controller_type == "single"
-
-    - block:
-        - name: OceanStor | Prepare multi csi-rbac
-          template:
-            src: huawei-csi-rbac-for-multi-controller.yaml.j2
-            dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac-for-multi-controller.yaml"
-
-        - name: OceanStor | Prepare multi csi-controller
-          template:
-            src: huawei-csi-multi-controller.yaml.j2
-            dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-multi-controller.yaml"
-      when: oceanstor_controller_type == "multi"
-
-    - name: OceanStor | Prepare csi-node
+    - name: OceanStor | Prepare single csi-controller
       template:
-        src: huawei-csi-node.yaml.j2
-        dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-node.yaml"
+        src: huawei-csi-controller.yaml.j2
+        dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-controller.yaml"
+    when: oceanstor_controller_type == "single"
 
-    - name: OceanStor | Deploy csi-configmap
-      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-configmap.yaml"
+  - block:
+    - name: OceanStor | Prepare multi csi-rbac
+      template:
+        src: huawei-csi-rbac-for-multi-controller.yaml.j2
+        dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac-for-multi-controller.yaml"
 
-    - block:
-        - name: OceanStor | Deploy single csi-rbac
-          shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac.yaml"
+    - name: OceanStor | Prepare multi csi-controller
+      template:
+        src: huawei-csi-multi-controller.yaml.j2
+        dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-multi-controller.yaml"
+    when: oceanstor_controller_type == "multi"
 
-        - name: OceanStor | Deploy single csi-controller
-          shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-controller.yaml"
-      when: oceanstor_controller_type == "single"
+  - name: OceanStor | Prepare csi-node
+    template:
+      src: huawei-csi-node.yaml.j2
+      dest: "{{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-node.yaml"
 
-    - block:
-        - name: OceanStor | Deploy multi csi-rbac
-          shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac-for-multi-controller.yaml"
+  - name: OceanStor | Deploy csi-configmap
+    shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-configmap.yaml"
 
-        - name: OceanStor | Deploy multi csi-controller
-          shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-multi-controller.yaml"
-      when: oceanstor_controller_type == "multi"
+  - block:
+    - name: OceanStor | Deploy single csi-rbac
+      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac.yaml"
 
-    - name: OceanStor | Deploy csi-node
-      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-node.yaml"
+    - name: OceanStor | Deploy single csi-controller
+      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-controller.yaml"
+    when: oceanstor_controller_type == "single"
+
+  - block:
+    - name: OceanStor | Deploy multi csi-rbac
+      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-rbac-for-multi-controller.yaml"
+
+    - name: OceanStor | Deploy multi csi-controller
+      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-multi-controller.yaml"
+    when: oceanstor_controller_type == "multi"
+
+  - name: OceanStor | Deploy csi-node
+    shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/oceanstor/huawei-csi-node.yaml"
   delegate_to: "{{ groups['kube-master'][0] }}"
   run_once: true

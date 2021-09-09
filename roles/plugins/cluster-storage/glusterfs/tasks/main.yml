@@ -1,36 +1,35 @@
 - block:
-    - name: Download  glusterfs mount utils package | CentOS
-      get_url:
-        validate_certs: no
-        url: "{{ gfs_rpm_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download  glusterfs mount utils package | CentOS
+    get_url:
+      validate_certs: no
+      url: "{{ gfs_rpm_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive  glusterfs mount utils package | CentOS
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_gfs_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive  glusterfs mount utils package | CentOS
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_gfs_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install glusterfs mount utils package | CentOS
-      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_gfs/*.rpm --nodeps --force"
+  - name: Install glusterfs mount utils package | CentOS
+    shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_gfs/*.rpm --nodeps --force"
   when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
-    - name: Download  glusterfs mount utils package | Debian
-      get_url:
-        validate_certs: no
-        url: "{{ gfs_deb_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download  glusterfs mount utils package | Debian
+    get_url:
+      validate_certs: no
+      url: "{{ gfs_deb_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive  glusterfs mount utils package | Debian
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive  glusterfs mount utils package | Debian
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install  glusterfs mount utils package | Debian
-      shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs/*.deb"
-      ignore_errors: true
+  - name: Install  glusterfs mount utils package | Debian
+    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs/*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]

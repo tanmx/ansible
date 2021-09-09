@@ -9,10 +9,10 @@
   when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
-    - name: Modify haproxy.service
-      template:
-        src: haproxy/haproxy-ubuntu.service.j2
-        dest: /usr/lib/systemd/system/haproxy.service
+  - name: Modify haproxy.service
+    template:
+      src: haproxy/haproxy-ubuntu.service.j2
+      dest: /usr/lib/systemd/system/haproxy.service
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - name: Configuration haproxy
@@ -29,8 +29,3 @@
     name: haproxy
     state: restarted
     enabled: yes
-#
-#- name: Start haproxy service
-#  service:
-#    name: haproxy
-#    state: started

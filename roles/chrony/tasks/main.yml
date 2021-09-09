@@ -43,7 +43,7 @@
       remote_src: yes
 
   - name: Install chrony package | Debian
-    shell: "cd {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony && dpkg -i ./*.deb"
+    shell: "cd {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony && apt install -y ./*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
@@ -94,4 +94,3 @@
     shell: "chronyc -a makestep"
     when: ansible_user == "root"
   when: 'inventory_hostname != groups.chrony[0]'
-

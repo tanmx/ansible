@@ -1,73 +1,71 @@
 - block:
-    - name: Download nfs-utils package | CentOS
-      get_url:
-        validate_certs: no
-        url: "{{ nfs_rpm_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download nfs-utils package | CentOS
+    get_url:
+      validate_certs: no
+      url: "{{ nfs_rpm_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive nfs-utils package | CentOS
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive nfs-utils package | CentOS
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install base package | CentOS
-      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs/*.rpm --nodeps --force"
+  - name: Install base package | CentOS
+    shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs/*.rpm --nodeps --force"
   when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
 - block:
-    - name: Download nfs-utils package | Debian
-      get_url:
-        validate_certs: no
-        url: "{{ nfs_deb_download_url }}"
-        dest: "{{ base_dir }}/packages"
-        timeout: "{{ download_timeout_online }}"
+  - name: Download nfs-utils package | Debian
+    get_url:
+      validate_certs: no
+      url: "{{ nfs_deb_download_url }}"
+      dest: "{{ base_dir }}/packages"
+      timeout: "{{ download_timeout_online }}"
 
-    - name: Unarchive nfs-utils package | Debian
-      unarchive:
-        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs_{{ ansible_architecture }}.tar.gz"
-        dest: "{{ base_dir }}/packages"
-        remote_src: yes
+  - name: Unarchive nfs-utils package | Debian
+    unarchive:
+      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs_{{ ansible_architecture }}.tar.gz"
+      dest: "{{ base_dir }}/packages"
+      remote_src: yes
 
-    - name: Install nfs-utils package | Debian
-      shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
-      ignore_errors: true
+  - name: Install nfs-utils package | Debian
+    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
-    - name: NFS| Set defaultvers
-      replace:
-        path: /etc/nfsmount.conf
-        regexp: '# Defaultvers=4'
-        replace: "Defaultvers=3"
+  - name: NFS| Set defaultvers
+    replace:
+      path: /etc/nfsmount.conf
+      regexp: '# Defaultvers=4'
+      replace: "Defaultvers=3"
 
-    - name: Set nfsvers
-      replace:
-        path: /etc/nfsmount.conf
-        regexp: '# Nfsvers=4'
-        replace: "Nfsvers=3"
+  - name: Set nfsvers
+    replace:
+      path: /etc/nfsmount.conf
+      regexp: '# Nfsvers=4'
+      replace: "Nfsvers=3"
 
-    - name: NFS| Set nfslock
-      replace:
-        path: /etc/nfsmount.conf
-        regexp: '# Lock=True'
-        replace: "Lock=False"
+  - name: NFS| Set nfslock
+    replace:
+      path: /etc/nfsmount.conf
+      regexp: '# Lock=True'
+      replace: "Lock=False"
   when: storage_nfs_server_version is defined and storage_nfs_server_version == "3"
   ignore_errors: true
 
 - block:
-    - name: NFS| Prepare nfs-client directory
-      file: name={{ kube_config_dir }}/plugins/storage-plugin/nfs state=directory
+  - name: NFS| Prepare nfs-client directory
+    file: name={{ kube_config_dir }}/plugins/storage-plugin/nfs state=directory
 
-    - name: NFS| Prepare nfs-client file
-      template:
-        src: nfs-client-provisioner.yaml.j2
-        dest: "{{ kube_config_dir }}/plugins/storage-plugin/nfs/{{ storage_nfs_provisioner_name }}.yaml"
+  - name: NFS| Prepare nfs-client file
+    template:
+      src: nfs-client-provisioner.yaml.j2
+      dest: "{{ kube_config_dir }}/plugins/storage-plugin/nfs/{{ storage_nfs_provisioner_name }}.yaml"
 
-    - name: NFS| Deploy nfs-client
-      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/nfs/{{ storage_nfs_provisioner_name }}.yaml"
-      ignore_errors: true
+  - name: NFS| Deploy nfs-client
+    shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/nfs/{{ storage_nfs_provisioner_name }}.yaml"
   delegate_to: "{{ groups['kube-master'][0] }}"
   run_once: true
   when: 'storage_local_volume_enabled is not defined'

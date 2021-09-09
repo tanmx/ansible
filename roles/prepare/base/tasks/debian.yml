@@ -26,10 +26,9 @@
 
 - name: Install base package | Debian
   shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base/*.deb"
-  ignore_errors: true
 
-- block:
 # 安装 ipvs
+- block:
   - name: Download ipvs package | Debian
     get_url:
       validate_certs: no
@@ -45,7 +44,6 @@
 
   - name: Install ipvs package | Debian
     shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs/*.deb"
-    ignore_errors: true
   when: kube_proxy_mode == "ipvs"
 
 - name: Disable rsyslog Get journald log 2
