@@ -10,82 +10,76 @@
   ignore_errors: true
   when: ansible_distribution in ['CentOS','RedHat','EulerOS']
 
-- block:
-  - name: Download chrony package | CentOS
-    get_url:
-      validate_certs: no
-      url: "{{ chrony_rpm_download_url }}"
-      dest: "{{ base_dir }}/packages"
-      timeout: "{{ download_timeout_online }}"
+- name: prepare some dirs
+  file: name={{ item }} state=directory
+  with_items:
+    - "/etc/chrony"
+    - "/var/lib/chrony"
+    - "/var/log/chrony"
 
-  - name: Unarchive chrony package | CentOS
-    unarchive:
-      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony_{{ ansible_architecture }}.tar.gz"
-      dest: "{{ base_dir }}/packages"
-      remote_src: yes
+- name: Check if chrony is installed | Debian
+  shell: "dpkg -l |grep chrony|xargs echo check:"
+  register: debian_chrony_status
+  ignore_errors: true
+  when: ansible_distribution in ["Ubuntu","Debian"]
 
-  - name: Install chrony package | CentOS
-    shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony/*.rpm --nodeps --force"
-  when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+- name: Check if chrony is installed | CentOS
+  shell: "rpm -qa |grep chrony|xargs echo check:"
+  register: centos_chrony_status
+  ignore_errors: true
+  when: ansible_distribution in ['CentOS','RedHat','EulerOS']
+
+- name: stop chronyd service
+  shell: 'systemctl stop chronyd && rm -rf /var/run/chrony'
+  ignore_errors: true
+  when: '"chrony" in centos_chrony_status.stdout or "chrony" in debian_chrony_status.stdout'
 
 - block:
   - name: Download chrony package | Debian
     get_url:
       validate_certs: no
-      url: "{{ chrony_deb_download_url }}"
+      url: "{{ chrony_download_url }}"
       dest: "{{ base_dir }}/packages"
       timeout: "{{ download_timeout_online }}"
+      mode: 0755
 
-  - name: Unarchive chrony package | Debian
+  - name: unarchive chrony package | Debian
     unarchive:
-      src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony_{{ ansible_architecture }}.tar.gz"
+      validate_certs: no
+      src: "{{ base_dir }}/packages/chrony_{{ chrony_version }}_{{ ansible_architecture }}.tar.gz"
       dest: "{{ base_dir }}/packages"
       remote_src: yes
 
-  - name: Install chrony package | Debian
-    shell: "cd {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony && apt install -y ./*.deb"
-  when: ansible_distribution in [ 'Ubuntu','Debian' ]
+  - name: Copy chronyd file  | Debian
+    copy: src={{ base_dir }}/packages/{{item}} dest=/usr/sbin/ mode=0755 remote_src=yes
+    with_items:
+      - "chrony/sbin/chronyd"
+      - "chrony/bin/chronyc"
+
+- name: Create chrony.service file  | Debian
+  template: src=chronyd.service.j2 dest=/lib/systemd/system/chronyd.service
 
 - block:
   - name: Setup chrony server
     template:
-      src: server-centos.conf.j2
-      dest: /etc/chrony.conf
+      src: server.conf.j2
+      dest: /etc/chrony/chrony.conf
 
-  - name: CentOS | chrony server
-    service:
-      name: chronyd
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+  - name: Start chorny server
+    shell: systemctl daemon-reload && systemctl restart chronyd
+    ignore_errors: true
 
-  - name: Debian | start chrony server
-    service:
-      name: chrony
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'Ubuntu','Debian' ]
   when: inventory_hostname == groups['chrony'][0]
 
 - block:
   - name: Config chrony client
     template:
-      src: client-centos.conf.j2
-      dest: /etc/chrony.conf
+      src: client.conf.j2
+      dest: /etc/chrony/chrony.conf
 
-  - name: Start chrony client
-    service:
-      name: chronyd
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
-
-  - name: Start chrony client
-    service:
-      name: chrony
-      state: restarted
-      enabled: yes
-    when: ansible_distribution in [ 'Ubuntu','Debian' ]
+  - name: Start chorny client
+    shell: systemctl daemon-reload && systemctl restart chronyd
+    ignore_errors: true
 
   - name: Calibration time server
     shell: "chronyc tracking"

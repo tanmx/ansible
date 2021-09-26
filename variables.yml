@@ -6,6 +6,7 @@ busybox_version: "1.28"
 cni_version: "v0.8.6"
 cni_calico_version: "v3.12.3"
 npd_versioon: "v0.8.1"
+chrony_version: "4.0"
 
 # ----------------------- 容器镜像地址 ---------------------
 # coredns
@@ -151,7 +152,6 @@ ceph_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:
 gfs_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_gfs_{{ ansible_architecture }}.tar.gz"
 oceanstor_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_oceanStor_{{ ansible_architecture }}.tar.gz"
 nfs_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_nfs_{{ ansible_architecture }}.tar.gz"
-chrony_rpm_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_chrony_{{ ansible_architecture }}.tar.gz"
 
 # ----------------------- Ubuntu/Debian deb下载地址 --------------------
 base_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base_{{ ansible_architecture }}.tar.gz"
@@ -160,5 +160,7 @@ ceph_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:
 gfs_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs_{{ ansible_architecture }}.tar.gz"
 oceanstor_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor_{{ ansible_architecture }}.tar.gz"
 nfs_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs_{{ ansible_architecture }}.tar.gz"
-chrony_deb_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/{{ ansible_distribution }}_{{ ansible_distribution_release }}_chrony_{{ ansible_architecture }}.tar.gz"
+
+# ----------------------- chrony 下载地址 --------------------
+chrony_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/oss-proxy/packages/{{ architectures }}/chrony_{{ chrony_version }}_{{ ansible_architecture }}.tar.gz"
 
