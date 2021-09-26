@@ -17,22 +17,19 @@
     - "/var/lib/chrony"
     - "/var/log/chrony"
 
-- name: Check if chrony is installed | Debian
-  shell: "dpkg -l |grep chrony|xargs echo check:"
-  register: debian_chrony_status
+- name: Check if chrony is installed
+  shell: "systemctl is-active chronyd.service"
+  register: chrony_status
   ignore_errors: true
-  when: ansible_distribution in ["Ubuntu","Debian"]
 
-- name: Check if chrony is installed | CentOS
-  shell: "rpm -qa |grep chrony|xargs echo check:"
-  register: centos_chrony_status
-  ignore_errors: true
-  when: ansible_distribution in ['CentOS','RedHat','EulerOS']
+- name: debug
+  debug:
+    msg: "{{ chrony_status }}"
 
 - name: stop chronyd service
   shell: 'systemctl stop chronyd && rm -rf /var/run/chrony'
   ignore_errors: true
-  when: '"chrony" in centos_chrony_status.stdout or "chrony" in debian_chrony_status.stdout'
+  when: '"active" in chrony_status.stdout'
 
 - block:
   - name: Download chrony package | Debian
@@ -55,6 +52,7 @@
     with_items:
       - "chrony/sbin/chronyd"
       - "chrony/bin/chronyc"
+  when: '"active" not in chrony_status.stdout'
 
 - name: Create chrony.service file  | Debian
   template: src=chronyd.service.j2 dest=/lib/systemd/system/chronyd.service
