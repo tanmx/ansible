@@ -17,14 +17,10 @@
     - "/var/lib/chrony"
     - "/var/log/chrony"
 
-- name: Check if chrony is installed | Debian
-  shell: "sudo dpkg -l | grep chrony | xargs echo check:"
-  register: debian_chrony_status
+- name: Check if chrony is installed
+  shell: "systemctl is-active chronyd.service"
+  register: chrony_status
   ignore_errors: true
-
-- name: debug
-  debug:
-    msg: "{{ chrony_status }}"
 
 - name: stop chronyd service
   shell: 'systemctl stop chronyd && rm -rf /var/run/chrony'
