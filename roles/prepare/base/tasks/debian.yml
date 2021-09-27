@@ -25,7 +25,7 @@
     remote_src: yes
 
 - name: Install base package | Debian
-  shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base/*.deb"
+  shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_base/*.deb"
 
 # 安装 ipvs
 - block:
@@ -43,7 +43,7 @@
       remote_src: yes
 
   - name: Install ipvs package | Debian
-    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs/*.deb"
+    shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ipvs/*.deb"
   when: kube_proxy_mode == "ipvs"
 
 - name: Disable rsyslog Get journald log 2

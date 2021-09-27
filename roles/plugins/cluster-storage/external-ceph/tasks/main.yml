@@ -1,71 +1,65 @@
 - block:
-    - block:
-        - name: Download ceph-utils package | CentOS
-          get_url:
-            validate_certs: no
-            url: "{{ ceph_rpm_download_url }}"
-            dest: "{{ base_dir }}/packages"
-            timeout: "{{ download_timeout_online }}"
+  - block:
+    - name: Download ceph-utils package | CentOS
+      get_url:
+        validate_certs: no
+        url: "{{ ceph_rpm_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
 
-        - name: Unarchive ceph-utils package | CentOS
-          unarchive:
-            src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_ceph_{{ ansible_architecture }}.tar.gz"
-            dest: "{{ base_dir }}/packages"
-            remote_src: yes
+    - name: Unarchive ceph-utils package | CentOS
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_ceph_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
 
-        - name: Install  ceph-utils package | CentOS
-          shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_ceph/*.rpm --nodeps --force"
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['all'] }}"
-      when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
+    - name: Install  ceph-utils package | CentOS
+      shell: "rpm -ivh {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}_ceph/*.rpm --nodeps --force"
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS' ]
 
-    - block:
-        - name: Download ceph-utils package | Debian
-          get_url:
-            validate_certs: no
-            url: "{{ ceph_deb_download_url }}"
-            dest: "{{ base_dir }}/packages"
-            timeout: "{{ download_timeout_online }}"
+  - block:
+    - name: Download ceph-utils package | Debian
+      get_url:
+        validate_certs: no
+        url: "{{ ceph_deb_download_url }}"
+        dest: "{{ base_dir }}/packages"
+        timeout: "{{ download_timeout_online }}"
 
-        - name: Unarchive ceph-utils package | Debian
-          unarchive:
-            src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph_{{ ansible_architecture }}.tar.gz"
-            dest: "{{ base_dir }}/packages"
-            remote_src: yes
+    - name: Unarchive ceph-utils package | Debian
+      unarchive:
+        src: "{{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph_{{ ansible_architecture }}.tar.gz"
+        dest: "{{ base_dir }}/packages"
+        remote_src: yes
 
-        - name: Install ceph-utils package | Debian
-          shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph/*.deb"
-          ignore_errors: true
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['all'] }}"
-      when: ansible_distribution in [ 'Ubuntu','Debian' ]
+    - name: Install ceph-utils package | Debian
+      shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph/*.deb"
+      ignore_errors: true
+    when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
-    - name: RBD Provisioner | Create storage-plugin directory
-      file:
-        path: "{{ kube_config_dir }}/plugins/storage-plugin/rbd-provisioner"
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-      when:
-        - inventory_hostname == groups['kube-master'][0]
+  - name: RBD Provisioner | Create storage-plugin directory
+    file:
+      path: "{{ kube_config_dir }}/plugins/storage-plugin/rbd-provisioner"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+    when: inventory_hostname == groups['kube-master'][0]
 
-    - name: RBD Provisioner | Templates list
-      set_fact:
-        rbd_provisioner_templates:
-          - { file: 'ceph-rbd-provisioner.yaml' }
+  - name: RBD Provisioner | Templates list
+    set_fact:
+      rbd_provisioner_templates:
+        - { file: 'ceph-rbd-provisioner.yaml' }
 
-    - name: RBD Provisioner | Create manifests
-      template:
-        src: "{{ item.file }}.j2"
-        dest: '{{ kube_config_dir }}/plugins/storage-plugin/rbd-provisioner/{{ item.file }}'
-      with_items: "{{ rbd_provisioner_templates }}"
-      when: inventory_hostname == groups['kube-master'][0]
+  - name: RBD Provisioner | Create manifests
+    template:
+      src: "{{ item.file }}.j2"
+      dest: '{{ kube_config_dir }}/plugins/storage-plugin/rbd-provisioner/{{ item.file }}'
+    with_items: "{{ rbd_provisioner_templates }}"
+    when: inventory_hostname == groups['kube-master'][0]
 
 
-    - name: RBD Provisioner | Deploy manifests
-      shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/rbd-provisioner/{{ item.file }}"
-      with_items: "{{ rbd_provisioner_templates }}"
-      when: inventory_hostname == groups['kube-master'][0]
-  when:
-    - architectures == 'amd64'
+  - name: RBD Provisioner | Deploy manifests
+    shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/plugins/storage-plugin/rbd-provisioner/{{ item.file }}"
+    with_items: "{{ rbd_provisioner_templates }}"
+    when: inventory_hostname == groups['kube-master'][0]
+  when: architectures == 'amd64'

@@ -31,7 +31,7 @@
       remote_src: yes
 
   - name: Install oceanStor-utils package | Debian
-    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor/*.deb"
+    shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_oceanStor/*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
 
 - block:
@@ -68,7 +68,7 @@
         remote_src: yes
 
     - name: Install nfs-utils package | Debian
-      shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
+      shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_nfs/*.deb"
     when: ansible_distribution in [ 'Ubuntu','Debian' ]
   when: oceanstor_type == "nfs"
 

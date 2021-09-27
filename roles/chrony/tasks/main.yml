@@ -1,9 +1,9 @@
-- name: Remove ntp
+- name: Remove ntp ｜ Debian
   shell: 'apt remove -y ntp'
   ignore_errors: true
   when: ansible_distribution in ["Ubuntu","Debian"]
 
-- name: Remove ntp
+- name: Remove ntp ｜ CentOS
   shell: 'yum remove -y ntp'
   args:
     warn: false
@@ -18,7 +18,7 @@
     - "/var/log/chrony"
 
 - name: Check if chrony is installed | Debian
-  shell: "dpkg -l |grep chrony|xargs echo check:"
+  shell: "sudo dpkg -l | grep chrony | xargs echo check:"
   register: debian_chrony_status
   ignore_errors: true
   when: ansible_distribution in ["Ubuntu","Debian"]
@@ -82,9 +82,9 @@
     ignore_errors: true
 
   - name: Calibration time server
-    shell: "chronyc tracking"
+    shell: "sudo chronyc tracking"
 
   - name: Active sync time
-    shell: "chronyc -a makestep"
+    shell: "sudo chronyc -a makestep"
     when: ansible_user == "root"
   when: 'inventory_hostname != groups.chrony[0]'

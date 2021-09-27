@@ -31,6 +31,6 @@
       remote_src: yes
   
   - name: Install ceph-utils package | Debian
-    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph/*.deb"
+    shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_ceph/*.deb"
     ignore_errors: true
   when: ansible_distribution in [ 'Ubuntu','Debian' ]

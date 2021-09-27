@@ -3,6 +3,6 @@
   - kube-worker
   - new-worker
   roles:
-#  - prepare/nameserver
-#  - prepare/base
+  - prepare/nameserver
+  - prepare/base
   - chrony

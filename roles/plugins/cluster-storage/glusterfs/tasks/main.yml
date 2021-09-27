@@ -31,5 +31,5 @@
       remote_src: yes
 
   - name: Install  glusterfs mount utils package | Debian
-    shell: "dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs/*.deb"
+    shell: "sudo dpkg -i {{ base_dir }}/packages/{{ ansible_distribution }}_{{ ansible_distribution_release }}_gfs/*.deb"
   when: ansible_distribution in [ 'Ubuntu','Debian' ]
