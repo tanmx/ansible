@@ -13,7 +13,7 @@ coredns_image_name: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/ku
 # dns-cache
 dns_cache_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/k8s-dns-node-cache:{{ dns_cache_version }}"
 # Pod image 地址
-pod_infra_container_image: "k8s.gcr.io/pause:{{ pause_version }}"
+pod_infra_container_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/pause:{{ pause_version }}"
 # 基础容器 image 地址
 sandbox_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/pause:{{ pause_version }}"
 # busybox_image image 地址
