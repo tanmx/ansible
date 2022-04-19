@@ -49,6 +49,9 @@ rook_csi_snapshotter_image: "{{ dns_repository_hostname }}:{{ registry_hosted_po
 rook_csi_attacher_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/k8scsi/csi-attacher:{{ rook_csi_attacher_version }}"
 # metrics-server image
 metrics_server_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/metrics-server:{{ metrics_server_version }}"
+# k8s dashboard 相关镜像
+k8s_dashboard_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/dashboard:{{ k8s_dashboard_version }}"
+metrics_scraper: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/metrics-scraper:{{ metrics_scraper_version }}"
 # npd image 地址
 npd_image: "{{ dns_repository_hostname }}:{{ registry_hosted_port }}/kubeoperator/node-problem-detector:{{ npd_versioon }}"
 # helm2 tiller image
