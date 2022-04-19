@@ -67,5 +67,5 @@
 
 #  - name: Ensure kube-operator namespace
 #    shell: " {{ bin_dir }}/kubectl get namespaces | grep kube-operator || {{ bin_dir }}/kubectl create namespace kube-operator"
-#  run_once: true
-#  delegate_to: "{{ groups['kube-master'][0] }}"
+  run_once: true
+  delegate_to: "{{ groups['kube-master'][0] }}"
