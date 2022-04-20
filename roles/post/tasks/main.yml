@@ -45,8 +45,8 @@
 - block:
   - name: Copy serviceAccount file
     template:
-      src: ko-admin.yaml.j2
-      dest: /etc/kubernetes/ko-admin.yaml
+      src: admin-user.yaml.j2
+      dest: /etc/kubernetes/admin-user.yaml
 
   - name: Ensure that apiserver accesses the etcd cluster properly
     shell: "{{ bin_dir }}/kubectl get ns"
