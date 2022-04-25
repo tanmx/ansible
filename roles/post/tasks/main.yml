@@ -56,7 +56,7 @@
     delay: 6
 
   - name: Deploy serviceAccount
-    shell: "{{ bin_dir }}/kubectl apply -f /etc/kubernetes/ko-admin.yaml"
+    shell: "{{ bin_dir }}/kubectl apply -f /etc/kubernetes/admin-user.yaml"
 
   - name: Ensure that apiserver accesses the etcd cluster properly
     shell: "{{ bin_dir }}/kubectl get ns"
