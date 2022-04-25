@@ -2,7 +2,7 @@
   yum:
     name: haproxy
     state: present
-  when: ansible_distribution in [ 'CentOS','RedHat','EulerOS','Kylin Linux Advanced Server' ]
+  when: ansible_distribution in [ 'CentOS','RedHat','EulerOS','Kylin Linux Advanced Server','UniontechOS' ]
 
 - name: Debian | Install haproxy
   apt:
@@ -32,6 +32,12 @@
     src: haproxy/haproxy-centos.service.j2
     dest: /usr/lib/systemd/system/haproxy.service
   when: ansible_distribution in [ 'CentOS','RedHat' ]
+
+- name: Modify UOS haproxy.service
+  template:
+    src: haproxy/haproxy-uos.service.j2
+    dest: /usr/lib/systemd/system/haproxy.service
+  when: ansible_distribution in [ 'UniontechOS' ]
 
 - name: Modify Kylin Linux Advanced Server haproxy.service
   template:

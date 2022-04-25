@@ -21,7 +21,7 @@
         dest: /etc/selinux/config
         regexp: "^SELINUX="
         line: "SELINUX=disabled"
-    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS','Kylin Linux Advanced Server' ]
+    when: ansible_distribution in [ 'CentOS','RedHat','EulerOS','Kylin Linux Advanced Server','UniontechOS' ]
 
   - block:
     - name: Debian | Status ufw
@@ -106,6 +106,12 @@
       src: haproxy/haproxy-centos.service.j2
       dest: /usr/lib/systemd/system/haproxy.service
     when: ansible_distribution in [ 'CentOS','RedHat' ]
+
+  - name: Modify UOS haproxy.service
+    template:
+      src: haproxy/haproxy-uos.service.j2
+      dest: /usr/lib/systemd/system/haproxy.service
+    when: ansible_distribution in [ 'UniontechOS' ]
 
   - name: Modify Kylin Linux Advanced Server haproxy.service
     template:
